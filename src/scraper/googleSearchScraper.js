@@ -1,8 +1,9 @@
 const axios = require('axios');
+const dotenv = require('dotenv');
 
 async function enrichDataWithGoogleSearch(events) {
-  const apiKey = 'YOUR_GOOGLE_API_KEY';
-  const cx = 'YOUR_CUSTOM_SEARCH_ENGINE_ID';
+  const apiKey = process.env.GOOGLE_API_KEY;
+  const cx = process.env.CUSTOM_SEARCH_ENGINE_ID;
 
   for (const event of events) {
     // Construct Google search query using the event name and/or organizer

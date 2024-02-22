@@ -1,5 +1,5 @@
-const scrapeEventDetails = require('./eventScraper');
-const enrichDataWithGoogleSearch = require('./googleScraper');
+const scrapeEventDetails = require('./src/scraper/eventbriteScaper');
+const enrichDataWithGoogleSearch = require('./src/scraper/googleSearchScraper');
 
 // Example usage
 const eventbriteUrl = 'https://www.eventbrite.com/';
