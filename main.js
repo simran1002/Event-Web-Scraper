@@ -1,13 +1,17 @@
-// main.js
+const scrapeEventDetails = require('./eventScraper');
+const enrichDataWithGoogleSearch = require('./googleScraper');
 
-const eventbriteScraper = require('./scraper/eventbriteScraper');
-const googleSearchScraper = require('./scraper/googleSearchScraper');
+// Example usage
+const eventbriteUrl = 'https://www.eventbrite.com/';
+scrapeEventDetails(eventbriteUrl)
+  .then(async (events) => {
+    console.log('Event Details:', events);
 
-async function main() {
-  const events = await eventbriteScraper();
-  const enrichedEvents = await googleSearchScraper(events);
+    // Enrich data via Google Search
+    await enrichDataWithGoogleSearch(events);
 
-  console.log(JSON.stringify(enrichedEvents, null, 2));
-}
-
-main();
+    console.log('Enriched Event Details:', events);
+  })
+  .catch((error) => {
+    console.error('Error:', error.message);
+  });

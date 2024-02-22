@@ -1,28 +1,47 @@
-// eventbriteScraper.js
-
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
+const ObjectsToCsv = require('objects-to-csv');
 
-async function scrapeEventbrite() {
-  const eventbriteURL = 'https://www.eventbrite.com/';
-  const response = await axios.get(eventbriteURL);
-  const $ = cheerio.load(response.data);
+async function scrapeEventDetails(url) {
+  try {
+    // Make a GET request to the Eventbrite page
+    const response = await axios.get(url);
 
-  const events = [];
+    // Load the HTML content into Cheerio
+    const $ = cheerio.load(response.data);
 
-  $('.eds-media-card-content__body').each((index, element) => {
-    const eventName = $(element).find('.eds-media-card-content__action-link').text().trim();
-    const eventDate = $(element).find('.eds-text-bs--fixed.eds-text-color--grey-600').text().trim();
-    const eventLocation = $(element).find('.eds-text-bs--fixed.eds-text-color--grey-600').next('div').text().trim();
+    // Extract key details of events
+    const events = [];
 
-    events.push({
-      name: eventName,
-      date: eventDate,
-      location: eventLocation,
+    $('.event-card').each((index, element) => {
+      const event = {
+        name: $(element).find('.event-name').text().trim(),
+        date: $(element).find('.event-date').text().trim(),
+        location: $(element).find('.event-location').text().trim(),
+        description: $(element).find('.event-description').text().trim(),
+        organizer: $(element).find('.event-organizer').text().trim(),
+      };
+
+      events.push(event);
     });
-  });
 
-  return events;
+    // Save extracted information in JSON format
+    const jsonFileName = 'events.json';
+    fs.writeFileSync(jsonFileName, JSON.stringify(events, null, 2));
+    console.log(`JSON data saved to ${jsonFileName}`);
+
+    // Save extracted information in CSV format
+    const csv = new ObjectsToCsv(events);
+    const csvFileName = 'events.csv';
+    await csv.toDisk(csvFileName);
+    console.log(`CSV data saved to ${csvFileName}`);
+
+    return events;
+  } catch (error) {
+    console.error('Event Scraper Error:', error.message);
+    throw error;
+  }
 }
 
-module.exports = scrapeEventbrite;
+module.exports = scrapeEventDetails;
